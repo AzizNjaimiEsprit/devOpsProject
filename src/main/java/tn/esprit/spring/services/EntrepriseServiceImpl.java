@@ -2,17 +2,20 @@ package tn.esprit.spring.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import tn.esprit.spring.entities.Departement;
-import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Entreprise;
 import tn.esprit.spring.repository.DepartementRepository;
 import tn.esprit.spring.repository.EntrepriseRepository;
 
+@Slf4j
 @Service
 public class EntrepriseServiceImpl implements IEntrepriseService {
 
@@ -20,6 +23,12 @@ public class EntrepriseServiceImpl implements IEntrepriseService {
     EntrepriseRepository entrepriseRepoistory;
 	@Autowired
 	DepartementRepository deptRepoistory;
+	
+	
+	@Override
+	public List<Entreprise> getAllEntreprises() {
+		return (List<Entreprise>) entrepriseRepoistory.findAll();
+	}
 	
 	public int ajouterEntreprise(Entreprise entreprise) {
 		entrepriseRepoistory.save(entreprise);
@@ -32,42 +41,52 @@ public class EntrepriseServiceImpl implements IEntrepriseService {
 	}
 	
 	public void affecterDepartementAEntreprise(int depId, int entrepriseId) {
-		//Le bout Master de cette relation N:1 est departement  
-				//donc il faut rajouter l'entreprise a departement 
-				// ==> c'est l'objet departement(le master) qui va mettre a jour l'association
-				//Rappel : la classe qui contient mappedBy represente le bout Slave
-				//Rappel : Dans une relation oneToMany le mappedBy doit etre du cote one.
-				Entreprise entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId).get();
-				Departement depManagedEntity = deptRepoistory.findById(depId).get();
-				
-				depManagedEntity.setEntreprise(entrepriseManagedEntity);
-				deptRepoistory.save(depManagedEntity);
-		
+		// Le bout Master de cette relation N:1 est departement
+		// donc il faut rajouter l'entreprise a departement
+		// ==> c'est l'objet departement(le master) qui va mettre a jour l'association
+		// Rappel : la classe qui contient mappedBy represente le bout Slave
+		// Rappel : Dans une relation oneToMany le mappedBy doit etre du cote one.
+
+		deptRepoistory.findById(depId).ifPresent(dep -> {
+			if (entrepriseRepoistory.findById(entrepriseId).isPresent()) {
+				dep.setEntreprise(entrepriseRepoistory.findById(entrepriseId).get());
+				deptRepoistory.save(dep);
+			}
+		});
+
 	}
 	
 	public List<String> getAllDepartementsNamesByEntreprise(int entrepriseId) {
-		Entreprise entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId).get();
 		List<String> depNames = new ArrayList<>();
-		for(Departement dep : entrepriseManagedEntity.getDepartements()){
-			depNames.add(dep.getName());
-		}
-		
+
+		entrepriseRepoistory.findById(entrepriseId).ifPresent(entrep -> {
+			for (Departement dep : entrep.getDepartements()) {
+				depNames.add(dep.getName());
+			}
+
+		});
+
 		return depNames;
 	}
 
 	@Transactional
 	public void deleteEntrepriseById(int entrepriseId) {
-		entrepriseRepoistory.delete(entrepriseRepoistory.findById(entrepriseId).get());	
+		entrepriseRepoistory.findById(entrepriseId).ifPresent(entrep -> entrepriseRepoistory.delete(entrep));
+
 	}
 
 	@Transactional
 	public void deleteDepartementById(int depId) {
-		deptRepoistory.delete(deptRepoistory.findById(depId).get());	
+		deptRepoistory.findById(depId).ifPresent(dep -> deptRepoistory.delete(dep));
+
 	}
 
 
 	public Entreprise getEntrepriseById(int entrepriseId) {
-		return entrepriseRepoistory.findById(entrepriseId).get();	
+		Optional<Entreprise> optionalEntreprise = entrepriseRepoistory.findById(entrepriseId);
+		return optionalEntreprise.isPresent() ? optionalEntreprise.get()
+				: optionalEntreprise.orElseThrow(() -> new NoSuchElementException(
+						"There's no entrepsise with the id %s in the database" + entrepriseId));
 	}
 
 }
