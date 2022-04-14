@@ -35,6 +35,10 @@ public class EntrepriseServiceImpl implements IEntrepriseService {
 		return entreprise.getId();
 	}
 
+	public Entreprise updateEntreprise(Entreprise entreprise) {
+		return entrepriseRepoistory.save(entreprise);
+	}
+
 	public int ajouterDepartement(Departement dep) {
 		deptRepoistory.save(dep);
 		return dep.getId();
