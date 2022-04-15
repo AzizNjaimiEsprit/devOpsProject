@@ -52,12 +52,13 @@ public class TestEntrepriseController {
 		Departement dep = new Departement("vermeg");
 		int a = es.ajouterDepartement(dep);
 		assertTrue(a > 0);
+		log.info("Test add department");
 		// clear db
 		dr.deleteById(a);
 	}
 
 	@Test
-	@DisplayName("Test add departement to entreprise")
+	@DisplayName("Test affect departement to entreprise")
     @Order(3)
 	public void affecterDepartementAEntrepriseTest() {
 		Entreprise entreprise = new Entreprise("vermeg", "vermeg");
@@ -71,6 +72,7 @@ public class TestEntrepriseController {
 			departementEntity = depOpt.get();
 		}
 		assertEquals(departementEntity.getEntreprise().getId(), addedEntrepriseId);
+		log.info("Test affect departement to entreprise");
 		// clear db
 		dr.deleteById(addedDepId);
 		er.deleteById(addedEntrepriseId);
@@ -86,6 +88,7 @@ public class TestEntrepriseController {
 		int addedDepId = es.ajouterDepartement(departement);
 		List<String> names = es.getAllDepartementsNamesByEntreprise(addedEntrepriseId);
 		assertNotNull(names);
+		log.info("Test get departement by entreprise");
 		// clear db
 		er.deleteById(addedEntrepriseId);
 		dr.deleteById(addedDepId);
@@ -104,6 +107,7 @@ public class TestEntrepriseController {
 		}
 		assertEquals(entr.getName(), ent.getName());
 		assertEquals(entr.getRaisonSocial(), ent.getRaisonSocial());
+		log.info("Test get entreprise by id");
 		// clear db
 		er.deleteById(a);
 	}
@@ -126,11 +130,10 @@ public class TestEntrepriseController {
 	public void deleteDepartementByIdTest() {
 		Departement dep = new Departement("vermeg");
 		int a = es.ajouterDepartement(dep);
-		log.info("test remove departemnt");
+		log.info("test remove departement");
 		es.deleteDepartementById(a);
 		Optional<Departement> mustBeNull = dr.findById(a);
 		assertFalse(mustBeNull.isPresent());
 	}
 
 }
-    
