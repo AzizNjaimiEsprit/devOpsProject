@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(value = OrderAnnotation.class)
 @DisplayName("Test Entreprise repository class")
 public class TestEntrepriseController {
-    private static final Logger log = LogManager.getLogger(TestEmployeRepository.class);
+    private static final Logger log = LogManager.getLogger(TestEntrepriseController.class);
 
     @Autowired
 	IEntrepriseService es;
@@ -32,12 +32,17 @@ public class TestEntrepriseController {
 	EntrepriseRepository er;
 	@Autowired
 	DepartementRepository dr;
-
+	
+	String etsName = "vermeg";
+	Entreprise ent = new Entreprise(etsName, etsName);
+	Departement dep = new Departement(etsName);
+	
+	
 	@Test
 	@DisplayName("Test insert entreprise methode")
     @Order(1)
 	public void ajouterEntrepriseTest() {
-		Entreprise ent = new Entreprise("vermeg", "vermeg");
+		
 		int a = es.ajouterEntreprise(ent);
 		assertTrue(a > 0);
 		log.info("Test add entreprise");
@@ -49,7 +54,7 @@ public class TestEntrepriseController {
 	@DisplayName("Test insert departement methode")
     @Order(2)
 	public void ajouterDepartementTest() {
-		Departement dep = new Departement("vermeg");
+		
 		int a = es.ajouterDepartement(dep);
 		assertTrue(a > 0);
 		log.info("Test add department");
@@ -61,17 +66,17 @@ public class TestEntrepriseController {
 	@DisplayName("Test affect departement to entreprise")
     @Order(3)
 	public void affecterDepartementAEntrepriseTest() {
-		Entreprise entreprise = new Entreprise("vermeg", "vermeg");
-		int addedEntrepriseId = es.ajouterEntreprise(entreprise);
-		Departement departement = new Departement("vermeg");
-		int addedDepId = es.ajouterDepartement(departement);
+		int addedEntrepriseId = es.ajouterEntreprise(ent);
+		int addedDepId = es.ajouterDepartement(dep);
 		es.affecterDepartementAEntreprise(addedDepId, addedEntrepriseId);
 		Optional<Departement> depOpt = dr.findById(addedDepId);
 		Departement departementEntity = null;
 		if (depOpt.isPresent()) {
 			departementEntity = depOpt.get();
 		}
-		assertEquals(departementEntity.getEntreprise().getId(), addedEntrepriseId);
+		if(departementEntity !=null){
+		 assertEquals(departementEntity.getEntreprise().getId(), addedEntrepriseId);
+		}
 		log.info("Test affect departement to entreprise");
 		// clear db
 		dr.deleteById(addedDepId);
@@ -82,10 +87,8 @@ public class TestEntrepriseController {
 	@DisplayName("Test get department by entreprise")
     @Order(4)
 	public void getAllDepartementsNamesByEntrepriseTest() {
-		Entreprise entreprise = new Entreprise("vermeg", "vermeg");
-		int addedEntrepriseId = es.ajouterEntreprise(entreprise);
-		Departement departement = new Departement("vermeg");
-		int addedDepId = es.ajouterDepartement(departement);
+		int addedEntrepriseId = es.ajouterEntreprise(ent);
+		int addedDepId = es.ajouterDepartement(dep);
 		List<String> names = es.getAllDepartementsNamesByEntreprise(addedEntrepriseId);
 		assertNotNull(names);
 		log.info("Test get departement by entreprise");
@@ -98,15 +101,16 @@ public class TestEntrepriseController {
 	@DisplayName("Test get entreprise by id")
     @Order(5)
 	public void getEntrepriseByIdTest() {
-		Entreprise ent = new Entreprise("vermeg", "vermeg");
 		int a = es.ajouterEntreprise(ent);
 		Optional<Entreprise> entOpt = er.findById(a);
 		Entreprise entr = null;
 		if (entOpt.isPresent()) {
 			entr = entOpt.get();
 		}
-		assertEquals(entr.getName(), ent.getName());
-		assertEquals(entr.getRaisonSocial(), ent.getRaisonSocial());
+		if(entr != null){
+		 assertEquals(entr.getName(), ent.getName());
+		 assertEquals(entr.getRaisonSocial(), ent.getRaisonSocial());
+		}
 		log.info("Test get entreprise by id");
 		// clear db
 		er.deleteById(a);
@@ -116,7 +120,6 @@ public class TestEntrepriseController {
 	@DisplayName("Test remove entreprise")
     @Order(6)
 	public void deleteEntrepriseByIdTest() {
-		Entreprise ent = new Entreprise("vermeg", "vermeg");
 		int a = es.ajouterEntreprise(ent);
 		log.info("test remove entreprise");
 		es.deleteEntrepriseById(a);
@@ -128,7 +131,6 @@ public class TestEntrepriseController {
 	@DisplayName("Test remove departement")
     @Order(7)
 	public void deleteDepartementByIdTest() {
-		Departement dep = new Departement("vermeg");
 		int a = es.ajouterDepartement(dep);
 		log.info("test remove departement");
 		es.deleteDepartementById(a);
