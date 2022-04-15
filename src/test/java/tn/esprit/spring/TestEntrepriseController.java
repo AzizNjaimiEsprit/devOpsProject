@@ -7,10 +7,15 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import tn.esprit.spring.entities.Departement;
 import tn.esprit.spring.entities.Entreprise;
+import tn.esprit.spring.repository.DepartementRepository;
+import tn.esprit.spring.repository.EntrepriseRepository;
 import tn.esprit.spring.services.IEntrepriseService;
 
-import java.util.NoSuchElementException;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,43 +26,111 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestEntrepriseController {
     private static final Logger log = LogManager.getLogger(TestEmployeRepository.class);
 
-    private static Entreprise entreprise;
     @Autowired
-    private IEntrepriseService entrepriseService;
+	IEntrepriseService es;
+	@Autowired
+	EntrepriseRepository er;
+	@Autowired
+	DepartementRepository dr;
 
-    @BeforeAll
-    public static void init() {
-
-        entreprise = new Entreprise();
-    }
-
-    @Test
-    @DisplayName("Test insert methode")
+	@Test
+	@DisplayName("Test insert entreprise methode")
     @Order(1)
-    public void testInsert() {
-        entrepriseService.ajouterEntreprise(entreprise);
-        log.info("Test add entreprisee");
-        assertTrue(entrepriseService.getEntrepriseById(entreprise.getId()) != null);
-    }
+	public void ajouterEntrepriseTest() {
+		Entreprise ent = new Entreprise("vermeg", "vermeg");
+		int a = es.ajouterEntreprise(ent);
+		assertTrue(a > 0);
+		log.info("Test add entreprise");
+		// clear db
+		er.deleteById(a);
+	}
 
-    @Test
-    @DisplayName("Test update entreprisee")
+	@Test
+	@DisplayName("Test insert departement methode")
     @Order(2)
-    public void testUpdate() {
-        log.info("Test update");
-        entreprise.setName("vermeg");
-        entrepriseService.ajouterEntreprise(entreprise);
-        log.info("update entreprisee name");
-        assertEquals("vermeg", entrepriseService.getEntrepriseById(entreprise.getId()).getName());
-    }
+	public void ajouterDepartementTest() {
+		Departement dep = new Departement("vermeg");
+		int a = es.ajouterDepartement(dep);
+		assertTrue(a > 0);
+		// clear db
+		dr.deleteById(a);
+	}
 
-    @Test
-    @DisplayName("test remove")
+	@Test
+	@DisplayName("Test add departement to entreprise")
     @Order(3)
-    public void testRemove() {
-        log.info("test remove entreprisee");
-        entrepriseService.deleteEntrepriseById(entreprise.getId());
-        assertThrows(NoSuchElementException.class, () -> entrepriseService.getEntrepriseById(entreprise.getId()));
-    }
+	public void affecterDepartementAEntrepriseTest() {
+		Entreprise entreprise = new Entreprise("vermeg", "vermeg");
+		int addedEntrepriseId = es.ajouterEntreprise(entreprise);
+		Departement departement = new Departement("vermeg");
+		int addedDepId = es.ajouterDepartement(departement);
+		es.affecterDepartementAEntreprise(addedDepId, addedEntrepriseId);
+		Optional<Departement> depOpt = dr.findById(addedDepId);
+		Departement departementEntity = null;
+		if (depOpt.isPresent()) {
+			departementEntity = depOpt.get();
+		}
+		assertEquals(departementEntity.getEntreprise().getId(), addedEntrepriseId);
+		// clear db
+		dr.deleteById(addedDepId);
+		er.deleteById(addedEntrepriseId);
+	}
+
+	@Test
+	@DisplayName("Test get department by entreprise")
+    @Order(4)
+	public void getAllDepartementsNamesByEntrepriseTest() {
+		Entreprise entreprise = new Entreprise("vermeg", "vermeg");
+		int addedEntrepriseId = es.ajouterEntreprise(entreprise);
+		Departement departement = new Departement("vermeg");
+		int addedDepId = es.ajouterDepartement(departement);
+		List<String> names = es.getAllDepartementsNamesByEntreprise(addedEntrepriseId);
+		assertNotNull(names);
+		// clear db
+		er.deleteById(addedEntrepriseId);
+		dr.deleteById(addedDepId);
+	}
+
+	@Test
+	@DisplayName("Test get entreprise by id")
+    @Order(5)
+	public void getEntrepriseByIdTest() {
+		Entreprise ent = new Entreprise("vermeg", "vermeg");
+		int a = es.ajouterEntreprise(ent);
+		Optional<Entreprise> entOpt = er.findById(a);
+		Entreprise entr = null;
+		if (entOpt.isPresent()) {
+			entr = entOpt.get();
+		}
+		assertEquals(entr.getName(), ent.getName());
+		assertEquals(entr.getRaisonSocial(), ent.getRaisonSocial());
+		// clear db
+		er.deleteById(a);
+	}
+
+	@Test
+	@DisplayName("Test remove entreprise")
+    @Order(6)
+	public void deleteEntrepriseByIdTest() {
+		Entreprise ent = new Entreprise("vermeg", "vermeg");
+		int a = es.ajouterEntreprise(ent);
+		log.info("test remove entreprise");
+		es.deleteEntrepriseById(a);
+		Optional<Entreprise> mustBeNull = er.findById(a);
+		assertFalse(mustBeNull.isPresent());
+	}
+
+	@Test
+	@DisplayName("Test remove departement")
+    @Order(7)
+	public void deleteDepartementByIdTest() {
+		Departement dep = new Departement("vermeg");
+		int a = es.ajouterDepartement(dep);
+		log.info("test remove departemnt");
+		es.deleteDepartementById(a);
+		Optional<Departement> mustBeNull = dr.findById(a);
+		assertFalse(mustBeNull.isPresent());
+	}
 
 }
+    
