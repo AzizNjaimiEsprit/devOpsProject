@@ -1,24 +1,16 @@
 package tn.esprit.spring.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.CreationTimestamp;
 
 
 @Entity
@@ -58,6 +50,10 @@ public class Employe implements Serializable {
 	//@JsonBackReference
 	@OneToMany(mappedBy="employe")
 	private List<Timesheet> timesheets;
+
+	@Column(updatable = false, insertable = false)
+	@CreationTimestamp
+	private Date joinDate;
 	
 	
 	public Employe() {
@@ -143,7 +139,8 @@ public class Employe implements Serializable {
 	public void setTimesheets(List<Timesheet> timesheets) {
 		this.timesheets = timesheets;
 	}
-	
+
+	public Date getJoinDate () {return joinDate;}
 	
 	
 }

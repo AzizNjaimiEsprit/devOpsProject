@@ -1,5 +1,7 @@
 package tn.esprit.spring.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,9 +20,11 @@ public class TimesheetPK implements Serializable {
 	
 	//Choisir le TemporalType selon le besoin metier
 	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dateDebut;
 	
 	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date dateFin;
 	
 
