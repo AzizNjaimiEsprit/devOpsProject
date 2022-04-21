@@ -33,6 +33,11 @@ public class ContractServiceImpl implements IContractService {
     }
 
     @Override
+    public Contrat getContratById(int contratId) {
+        return contratRepository.findById(contratId).get();
+    }
+
+    @Override
     public void deleteContratById(int contratId) {
         contratRepository.findById(contratId).ifPresent(c -> contratRepository.delete(c));
     }
