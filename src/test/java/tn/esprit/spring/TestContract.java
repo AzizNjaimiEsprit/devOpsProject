@@ -63,7 +63,7 @@ public class TestContract {
 
 
     @Test
-    @DisplayName("Select les contrats")
+    @DisplayName("Selection des contrats")
     @Order(3)
     public void getAllContract() {
         log.info("Get all contracts");
