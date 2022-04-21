@@ -75,7 +75,6 @@ public class TestContract {
     @Order(4)
     public void UpdateContract() {
         log.info("Update contract");
-        Contrat contrat = iContractService.getContratById(1);
         contrat.setTypeContrat("CDD");
         iContractService.addOrUpdateContrat(contrat);
         log.info("Update contract type");
@@ -88,7 +87,7 @@ public class TestContract {
     @Order(5)
     public void RemoveContract() {
         log.info("Remove Contract");
-        iContractService.deleteContratById(1);
-        assertFalse(iContractService.getAllContrats().contains(iContractService.getContratById(2)));
+        iContractService.deleteContratById(contrat.getReference());
+        assertFalse(iContractService.getAllContrats().contains(contrat));
     }
 }
