@@ -9,5 +9,7 @@ public interface IContractService {
     public List<Contrat> getAllContrats();
     public Contrat addOrUpdateContrat(Contrat contrat) ;
     public String getTypeContratById(int contratId);
+    public Contrat getContratById(int contratId);
+
     public void deleteContratById(int contratId);
 }
