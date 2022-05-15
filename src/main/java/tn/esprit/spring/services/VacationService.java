@@ -74,17 +74,17 @@ public class VacationService implements IVacationService{
     }
     @Override
     public VacationRequest getRequestById(long requestReference) {
-        return getFullRequest(vacationRequestManager.getOne(requestReference));
+        return getFullRequest(vacationRequestManager.findById(requestReference).get());
     }
 
     @Override
     public List<VacationRequest> getSupervisorRequests(int supervisorId) {
-        return vacationRequestManager.findAllBySuperVisor(supervisorId).stream().map(req -> getFullRequest(req)).collect(Collectors.toList());
+        return vacationRequestManager.findVacationRequestsBySupervisor_Id(supervisorId).stream().map(req -> getFullRequest(req)).collect(Collectors.toList());
     }
 
     @Override
     public List<VacationRequest> getEmployeeRequests(int empId) {
-        return vacationRequestManager.findAllByEmployee(empId).stream().map(req -> getFullRequest(req)).collect(Collectors.toList());
+        return vacationRequestManager.findVacationRequestsByEmploye_Id(empId).stream().map(req -> getFullRequest(req)).collect(Collectors.toList());
     }
 
     @Override

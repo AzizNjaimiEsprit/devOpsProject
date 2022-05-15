@@ -29,12 +29,12 @@ public class VacationRequest {
     @JoinColumn(name = "supervisor_id")
     private Employe supervisor;
 
-    @Column (name = "start_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column (name = "start_date", nullable = false)
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date from;
 
-    @Column (name = "end_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column (name = "end_date", nullable = false)
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date to;
     @Column
     private Boolean approved;

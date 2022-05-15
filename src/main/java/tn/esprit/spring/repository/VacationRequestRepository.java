@@ -11,10 +11,7 @@ import java.util.List;
 
 @Repository
 public interface VacationRequestRepository extends JpaRepository<VacationRequest, Long> {
-    @Query("select v from VacationRequest v where v.supervisor = :supervisor_id and v.approved is null")
-    List<VacationRequest> findAllBySuperVisor (@Param("supervisor_id") int id);
+    List<VacationRequest> findVacationRequestsByEmploye_Id(int id);
 
-    @Query("select v from VacationRequest v where v.employe = :employee_id and v.approved is null")
-    List<VacationRequest> findAllByEmployee (@Param("employee_id") int id);
-
+    List<VacationRequest> findVacationRequestsBySupervisor_Id(int id);
 }

@@ -31,6 +31,7 @@ public class Employe implements Serializable {
 	//@Pattern(regex=".+\@.+\..+")
 	private String email;
 
+	@JsonIgnore
 	private String password;
 
 	private boolean actif;
