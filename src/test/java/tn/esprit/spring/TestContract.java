@@ -42,7 +42,7 @@ public class TestContract {
         int reference = iContractService.addOrUpdateContrat(contrat).getReference();
         contrat.setReference(reference);
         log.info("Test add");
-        assertTrue(reference != 0 );
+        assertTrue(iContractService.getAllContrats().stream().anyMatch(e -> e.getReference() == contrat.getReference()));
 
     }
     @Test
