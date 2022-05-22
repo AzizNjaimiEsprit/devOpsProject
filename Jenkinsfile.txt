@@ -1,0 +1,75 @@
+pipeline {
+    environment {
+        registry = "jmaroua/timesheetdocker"
+        registryCredential = 'jmaroua'
+        dockerImage = 'timesheet'
+    }
+    agent any
+
+    tools {
+        maven "maven"
+        jdk "java"
+    }
+
+   stages {
+        stage("Clean workspace") {
+            steps {
+            deleteDir()
+            }
+        }
+        stage('Cloning Project from Git') {
+            steps { bat("git clone https://github.com/AzizNjaimiEsprit/devOpsProject .")} 
+        }
+        stage("Build"){
+            steps{
+                bat "mvn clean"
+            }
+        }
+        
+        stage("Compliation") {
+            steps {
+            bat "mvn compile"
+        }}
+        stage("Packaging"){
+            steps {
+            bat "mvn clean package -DskipTests=true"
+        }}
+        /*stage("Unit tests") {
+            steps {
+            bat "mvn test"
+        }}*/
+        
+        stage("Static tests (sonar)") {
+            steps {
+            bat "mvn sonar:sonar -Dsonar.projectKey=Timesheet -Dsonar.host.url=http://localhost:9000 -Dsonar.login=67dd3417246fc3a39c9400dc50531afc8bdb8cf5"
+        }}
+        
+        
+        stage("DEPLOY to Nexus") {
+            steps {
+            bat "mvn clean package -DskipTests deploy:deploy-file -DgroupId=tn.esprit -DartifactId=devOpsProject -Dversion=1.0 -DgeneratePom=true -Dpackaging=jar -DrepositoryId=deploymentRepo -Durl=http://localhost:8081/repository/maven-releases/ -Dfile=target/timesheet-1.0-SNAPSHOT.jar"
+        }}
+        stage('Building our image') {
+            steps {
+                script {
+                 dockerImage = docker build -f Dockerfile.txt registry + ":$BUILD_NUMBER"
+                }
+            }
+        }
+        stage('Deploy our image') {
+            steps {
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('Cleaning up') {
+            steps {
+                bat "docker rmi $registry:$BUILD_NUMBER"
+            }
+        }
+     
+    }
+}
