@@ -3,6 +3,9 @@ package tn.esprit.spring.util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tn.esprit.spring.entities.Employe;
+import tn.esprit.spring.entities.Mission;
+import tn.esprit.spring.repository.DepartementRepository;
+import tn.esprit.spring.repository.MissionRepository;
 import tn.esprit.spring.services.IEmployeService;
 import tn.esprit.spring.services.IVacationService;
 
@@ -12,10 +15,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class TimeSheetUtility {
@@ -31,6 +31,10 @@ public class TimeSheetUtility {
     private static IEmployeService employeeManager;
 
     private static IVacationService vacationManager;
+
+    private static MissionRepository missionManager;
+
+    private static DepartementRepository departementManager;
 
     @PostConstruct
     private void init () {
@@ -51,6 +55,18 @@ public class TimeSheetUtility {
                     .stream()
                     .mapToLong(vacation -> diffBetweenDates(vacation.getFrom(), vacation.getTo()))
                     .sum());
+    }
+
+    public static boolean isMissionAccessible (Employe employe, int missionId) {
+        Mission mission = missionManager.findById(missionId).get();
+
+        if (Objects.isNull(mission) || Objects.isNull(employe))
+            return Boolean.FALSE;
+
+        if (departementManager.findDepartementsBySupervisor(employe.getId()).stream().filter(dep -> mission.getDepartement().getId() == dep.getId()).findFirst().orElse(null) == null)
+            return Boolean.FALSE;
+
+        return Boolean.TRUE;
     }
 
     public static long diffBetweenDates(Date from, Date to) {

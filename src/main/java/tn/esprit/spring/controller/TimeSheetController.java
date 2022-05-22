@@ -7,6 +7,7 @@ import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Mission;
 import tn.esprit.spring.entities.Role;
 import tn.esprit.spring.entities.Timesheet;
+import tn.esprit.spring.repository.TimesheetRepository;
 import tn.esprit.spring.services.ITimesheetService;
 import tn.esprit.spring.util.TimeSheetUtility;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/timesheets")
@@ -24,47 +26,42 @@ public class TimeSheetController {
     @Autowired
     private ITimesheetService timeSheetManager;
 
+    @Autowired
+    private TimesheetRepository timesheetRepository;
+
     @PostMapping("/addMission")
     private void addMission(HttpServletRequest httpRequest,HttpServletResponse response, @RequestBody Mission mission) throws IOException {
         Employe currentUser = TimeSheetUtility.basicAuth(httpRequest);
-        if (currentUser == null) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Authentification failed");
-            return;
-        }
-
-        if (!currentUser.getRole().equals(Role.CHEF_DEPARTEMENT)) {
+        if (Objects.isNull(currentUser) || !currentUser.getRole().equals(Role.CHEF_DEPARTEMENT) || !TimeSheetUtility.isMissionAccessible(currentUser, mission.getId())) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have priviliges");
             return;
         }
+
         // check department
         timeSheetManager.addMission(mission);
     }
 
     @PostMapping("{missionId}/assignMission")
-    private void assignMissionToEmployees (HttpServletRequest httpRequest, HttpServletResponse response, @RequestBody List<Employe> employes, @PathVariable int missionId, @RequestParam Date from, @RequestParam Date to) throws IOException {
+    private void assignMissionToEmployees (HttpServletRequest httpRequest, HttpServletResponse response, @RequestBody List<Employe> employees, @PathVariable int missionId, @RequestParam Date from, @RequestParam Date to) throws IOException {
         Employe currentUser = TimeSheetUtility.basicAuth(httpRequest);
-        if (currentUser == null) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Authentification failed");
-            return;
-        }
-
-        if (!currentUser.getRole().equals(Role.CHEF_DEPARTEMENT)) {
+        if (Objects.isNull(currentUser) || !currentUser.getRole().equals(Role.CHEF_DEPARTEMENT) || !TimeSheetUtility.isMissionAccessible(currentUser, missionId)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have priviliges");
             return;
         }
 
+        if (employees == null || employees.isEmpty())
+            return;
 
-    }
-
-    @PostMapping("/startMission")
-    private void launchMission (HttpServletRequest request, @PathVariable Date from, @PathVariable Date to) {
-
-
+        employees.stream().forEach(employe -> timeSheetManager.addTimeSheet(missionId, employe.getId(), from, to));
     }
 
     @GetMapping("/findByMission")
-    private List<Timesheet> findByMission (HttpServletRequest request, @PathVariable int missionId) {
-        return Collections.emptyList();
+    private List<Timesheet> findByMission (HttpServletRequest request, HttpServletResponse response, @PathVariable int missionId) throws IOException {
+        Employe currentUser = TimeSheetUtility.basicAuth(request);
+        if (currentUser == null || !TimeSheetUtility.isMissionAccessible(currentUser, missionId))
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have priviliges");
+
+        return timesheetRepository.findTimesheetsByMission_Id(missionId);
     }
 
     @GetMapping("/findByEmployee")

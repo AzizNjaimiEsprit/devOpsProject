@@ -39,7 +39,7 @@ public class TimesheetServiceImpl implements ITimesheetService {
 
 	@Override
 	public Mission addMission(Mission mission) {
-		return Optional.ofNullable(mission).map(m -> missionManager.save(m)).orElse(null);
+		return Optional.ofNullable(mission).map(m -> missionManager.save(mission)).orElse(null);
 	}
 
 	@Override
