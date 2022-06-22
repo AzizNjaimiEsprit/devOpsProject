@@ -52,7 +52,7 @@ public class TimeSheetController {
         if (employees == null || employees.isEmpty())
             return;
 
-        employees.stream().forEach(employe -> timeSheetManager.addTimeSheet(missionId, employe.getId(), from, to));
+        employees.stream().forEach(employee -> timeSheetManager.addTimeSheet(missionId, employee.getId(), from, to));
     }
 
     @GetMapping("/findByMission")
@@ -65,12 +65,18 @@ public class TimeSheetController {
     }
 
     @GetMapping("/findByEmployee")
-    private List<Timesheet> findByEmployee (HttpServletRequest request, @PathVariable int employeeId) {
-        return Collections.emptyList();
+    private List<Timesheet> findByEmployee (HttpServletRequest request, @PathVariable int employeeId, @RequestParam Date from, @RequestParam Date to) {
+        Employe currentUser = TimeSheetUtility.basicAuth(request);
+        if (currentUser == null)
+            return Collections.emptyList();
+        return timeSheetManager.findAllTimeSheetsByEmployee(employeeId, from, to);
     }
 
     @GetMapping("/findBetween")
-    private List<Timesheet> findByMission (HttpServletRequest request, @PathVariable Date from, @PathVariable Date to) {
-        return Collections.emptyList();
+    private List<Timesheet> findByMission (HttpServletRequest request, @PathVariable int missionId, @RequestParam Date from, @RequestParam Date to) {
+        Employe currentUser = TimeSheetUtility.basicAuth(request);
+        if (currentUser == null || !TimeSheetUtility.isMissionAccessible(currentUser, missionId))
+            return Collections.emptyList();
+        return timeSheetManager.findAllTimeSheetsByMission(missionId, from, to);
     }
 }

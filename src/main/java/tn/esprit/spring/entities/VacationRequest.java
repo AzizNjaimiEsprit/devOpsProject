@@ -54,4 +54,8 @@ public class VacationRequest {
 
     }
 
+    public void setId (long id) {requestReference = id;}
+
+    public long getId () {return requestReference;}
+
 }

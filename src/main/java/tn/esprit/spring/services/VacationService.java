@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class VacationService implements IVacationService{
 
     @Autowired
-    private VacationRequestRepository vacationRequestManager;
+    public VacationRequestRepository vacationRequestManager;
 
     @Autowired
     private VacationRepository vacationManager;

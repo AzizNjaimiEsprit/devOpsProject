@@ -37,4 +37,11 @@ public interface TimesheetRepository extends CrudRepository<Timesheet, Integer> 
 	List<Timesheet> getOverlappingTimeSheetsByMission_id (@Param("mission_id") int missionId, @Param("from") Date from, @Param("to") Date to);
 
 	List<Timesheet> findTimesheetsByMission_Id (int missionId);
+
+	@Query("Select t from Timesheet t "
+			+ "where t.mission=:mis and "
+			+ "t.employe=:emp and "
+			+ "t.timesheetPK.dateDebut>=:dateD and "
+			+ "t.timesheetPK.dateFin<=:dateF")
+	List<Timesheet> getTimesheetsByMissionAndDate(@Param("emp")Employe employe, @Param("mis")Mission mission, @Param("dateD")Date dateDebut,@Param("dateF")Date dateFin);
 }
