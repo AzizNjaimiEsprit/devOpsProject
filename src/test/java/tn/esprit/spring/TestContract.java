@@ -33,7 +33,7 @@ public class TestContract {
     @Test
     @DisplayName("Ajout d'un contrat 1")
     @Order(1)
-    public void testAjoutContrat1() {
+    void testAjoutContrat1() {
         Employe  employe = new Employe("samar","neji","email@gmail","1234",true, Role.INGENIEUR);
         contrat.setTypeContrat("CDI");
         contrat.setEmploye(employe);
@@ -48,7 +48,7 @@ public class TestContract {
     @Test
     @DisplayName("Ajout d'un contrat 2")
     @Order(2)
-    public void testAjoutContrat2() {
+    void testAjoutContrat2() {
         Employe  employe = new Employe("samar","neji","email@gmail","1234",true, Role.INGENIEUR);
         contrat.setTypeContrat("CDI");
         contrat.setEmploye(employe);
@@ -65,7 +65,7 @@ public class TestContract {
     @Test
     @DisplayName("Selection des contrats")
     @Order(3)
-    public void getAllContract() {
+    void getAllContract() {
         log.info("Get all contracts");
         assertTrue(iContractService.getAllContrats().size() > 0);
     }
@@ -73,7 +73,7 @@ public class TestContract {
     @Test
     @DisplayName("Modifier un contrat ")
     @Order(4)
-    public void UpdateContract() {
+    void UpdateContract() {
         log.info("Update contract");
         contrat.setTypeContrat("CDD");
         iContractService.addOrUpdateContrat(contrat);
@@ -85,7 +85,7 @@ public class TestContract {
     @Test
     @DisplayName("Supprimer un contrat ")
     @Order(5)
-    public void RemoveContract() {
+    void RemoveContract() {
         log.info("Remove Contract");
         iContractService.deleteContratById(contrat.getReference());
         assertFalse(iContractService.getAllContrats().contains(contrat));

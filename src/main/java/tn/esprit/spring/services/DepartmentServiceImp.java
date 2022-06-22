@@ -44,7 +44,6 @@ public class DepartmentServiceImp implements IDepartmentService {
     public void deletedepartementById(int departementId) {
         Optional<Departement> optionaldepratement = deptRepoistory.findById(departementId);
         optionaldepratement.ifPresent(o -> {
-//            entrepriseService.deleteDepartementById(o.getId());
             Entreprise entreprise = entrepriseService.getEntrepriseById(o.getEntreprise().getId());
             entreprise.getDepartements().remove(o);
             entrepriseService.updateEntreprise(entreprise);

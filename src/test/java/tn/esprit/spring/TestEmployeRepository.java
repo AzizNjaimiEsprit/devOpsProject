@@ -40,7 +40,7 @@ public class TestEmployeRepository {
     @Test
     @DisplayName("Test insert methode")
     @Order(1)
-    public void testInsert() {
+    void testInsert() {
         employe = employeService.addOrUpdateEmploye(employe);
 
         log.info("Test add");
@@ -51,7 +51,7 @@ public class TestEmployeRepository {
     @Test
     @DisplayName("test select")
     @Order(2)
-    public void testSelect() {
+    void testSelect() {
         log.info("test select method");
         assertTrue(employeService.getAllEmployes().size() > 0);
     }
@@ -59,7 +59,7 @@ public class TestEmployeRepository {
     @Test
     @DisplayName("Test update methode")
     @Order(3)
-    public void testUpdate() {
+    void testUpdate() {
         log.info("Test update");
         employe.setPrenom("yassine");
         employeService.addOrUpdateEmploye(employe);
@@ -70,7 +70,7 @@ public class TestEmployeRepository {
     @Test
     @DisplayName("test affecterContratAEmploye")
     @Order(4)
-    public void testAffecterContratAEmploye() {
+    void testAffecterContratAEmploye() {
 
 
         log.info("Start Method affecterContratAEmploye");
@@ -90,7 +90,7 @@ public class TestEmployeRepository {
     @Test
     @DisplayName("test remove")
     @Order(5)
-    public void testRemove() {
+    void testRemove() {
         log.info("test remove");
         employeService.deleteContratById(employe.getContrat().getReference());
         employeService.deleteEmployeById(employe.getId());
