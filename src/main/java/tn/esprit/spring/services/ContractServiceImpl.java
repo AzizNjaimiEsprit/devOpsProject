@@ -34,7 +34,9 @@ public class ContractServiceImpl implements IContractService {
 
     @Override
     public Contrat getContratById(int contratId) {
-        return contratRepository.findById(contratId).get();
+        Optional<Contrat> contrat = contratRepository.findById(contratId);
+        return contrat.isPresent() ? contrat.get()
+                :null;
     }
 
     @Override
