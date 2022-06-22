@@ -44,6 +44,7 @@ public class TestDepartement {
     @DisplayName("Test Ajouter Enterprise")
     @Order(1)
     public void test1_AddEnterprise() {
+        log.info("test add enterprise");
         entreprise.setName("Vermeg");
         entreprise.setDepartements(new ArrayList<>());
         entreprise.setRaisonSocial("LAC 1");
@@ -56,6 +57,7 @@ public class TestDepartement {
     @DisplayName("Test Ajouter Departement")
     @Order(2)
     public void test2_testAddDepartment() {
+        log.info("test add department");
         departement.setName("IT");
         departement.setEntreprise(entreprise);
         departement.setEmployes(new ArrayList<>());
@@ -68,7 +70,7 @@ public class TestDepartement {
     @DisplayName("test Get Department By Id")
     @Order(3)
     public void test3_getDepartment() {
-        log.info("test select method");
+        log.info("test get department");
         Departement res = IDepartmentService.getDepartement(departement.getId());
         assertTrue(res.equals(departement));
     }
@@ -77,7 +79,7 @@ public class TestDepartement {
     @DisplayName("Test Update Department")
     @Order(4)
     public void test4_updateDepartment() {
-        log.info("Test update");
+        log.info("Test update department");
         departement.setName("DEV");
         departement = this.IDepartmentService.addOrUpdateDepartement(departement);
         assertEquals("DEV", IDepartmentService.getDepartementName(departement.getId()));
@@ -87,7 +89,7 @@ public class TestDepartement {
     @DisplayName("test Delete Department")
     @Order(5)
     public void test5_testRemove() {
-        log.info("test remove");
+        log.info("test remove department");
         this.IDepartmentService.deletedepartementById(departement.getId());
         assertFalse(this.IDepartmentService.getAllDepartements().contains(departement));
     }
