@@ -1,5 +1,7 @@
 package tn.esprit.spring.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tn.esprit.spring.entities.Employe;
@@ -26,6 +28,9 @@ public class TimeSheetUtility {
     private static MissionRepository missionManager;
     private static DepartementRepository departementManager;
 
+    private static final Logger logger = LoggerFactory.getLogger(TimeSheetUtility.class);
+
+
     @Autowired
     private IVacationService vacationBean;
     @Autowired
@@ -35,7 +40,16 @@ public class TimeSheetUtility {
         String auth = request.getHeaders("Authorization").nextElement();
         String user = new String(Base64.getDecoder().decode(auth.split(" ", 2)[1]));
         List<String> credentials = Arrays.asList(user.split(":"));
-        return employeeManager.authenticate(credentials.get(0), credentials.get(1));
+        if (credentials.size() < 2) {
+            logger.error("Authentication : missing credentials");
+            return null;
+        }
+
+        Employe authenticatedEmp = employeeManager.authenticate(credentials.get(0), credentials.get(1));
+        if (authenticatedEmp == null)
+            logger.error(String.format("Authentication failed for user %s", credentials.get(0)));
+
+        return authenticatedEmp;
     }
 
     public static double getHolidayBalance(Employe employe) {

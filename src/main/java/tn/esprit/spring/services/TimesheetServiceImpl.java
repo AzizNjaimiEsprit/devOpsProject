@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,9 @@ public class TimesheetServiceImpl implements ITimesheetService {
 	@Autowired
 	private DepartementRepository departementManager;
 
+	private static final Logger logger = LoggerFactory.getLogger(TimesheetServiceImpl.class);
+
+
 	@Override
 	public Mission addMission(Mission mission) {
 		return Optional.ofNullable(mission).map(m -> missionManager.save(mission)).orElse(null);
@@ -45,28 +50,42 @@ public class TimesheetServiceImpl implements ITimesheetService {
 	@Override
 	public void assignMissionToDepartment(int missionId, int depId) {
 		Departement requestedDepartment = departementManager.findById(depId).get();
-		if (Objects.isNull(requestedDepartment))
+		if (Objects.isNull(requestedDepartment)) {
+			logger.error("Assigning mission failed. Please check mission details");
 			throw new RuntimeException("Department doesn't exist");
+		}
+
 		Optional.ofNullable(missionManager.findById(missionId).get()).ifPresent(m -> {
 			m.setDepartement(requestedDepartment);
 			missionManager.save(m);
+			logger.info("Mission assigned successfully");
 		});
 	}
 
 	@Override
 	public void addTimeSheet(int missionId, int employeId, Date dateDebut, Date dateFin) {
 		Mission mission = missionManager.findById(missionId).get();
-		if (Objects.isNull(mission))
+		if (Objects.isNull(mission)) {
+			logger.error("Add timesheet failed there is no such mission");
 			throw new RuntimeException("Mission doesn't exist");
+		}
+
 
 		Employe employe = employeeRepository.findById(missionId).get();
-		if (Objects.isNull(employe))
+		if (Objects.isNull(employe)) {
+			logger.error("Add timesheet failed there is no such employee");
 			throw new RuntimeException("Employee doesn't exist");
+		}
 
-		if (Objects.isNull(dateDebut) || Objects.isNull(dateFin) || dateDebut.after(dateFin))
+
+		if (Objects.isNull(dateDebut) || Objects.isNull(dateFin) || dateDebut.after(dateFin)) {
+			logger.error("Add timesheet failed check start & end date");
 			throw new RuntimeException("Timesheet input is wrong");
+		}
+
 
 		timesheetManager.save(generateTimeSheet(mission, employe, dateDebut, dateFin));
+		logger.info("Timesheet added successfully");
 	}
 
 	private Timesheet generateTimeSheet (Mission mission , Employe employe, Date start, Date end) {

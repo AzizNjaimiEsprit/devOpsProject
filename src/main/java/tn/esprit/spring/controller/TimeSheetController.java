@@ -1,6 +1,8 @@
 package tn.esprit.spring.controller;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.spring.entities.Employe;
@@ -18,8 +20,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
 
 @RestController
+@Slf4j
 @RequestMapping("/timesheets")
 public class TimeSheetController {
 
@@ -29,10 +33,13 @@ public class TimeSheetController {
     @Autowired
     private TimesheetRepository timesheetRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(TimeSheetController.class);
+
     @PostMapping("/addMission")
     private void addMission(HttpServletRequest httpRequest,HttpServletResponse response, @RequestBody Mission mission) throws IOException {
         Employe currentUser = TimeSheetUtility.basicAuth(httpRequest);
         if (Objects.isNull(currentUser) || !currentUser.getRole().equals(Role.CHEF_DEPARTEMENT) || !TimeSheetUtility.isMissionAccessible(currentUser, mission.getId())) {
+            logger.info("Request failed user doesn't have access");
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have priviliges");
             return;
         }
