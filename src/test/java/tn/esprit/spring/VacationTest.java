@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Vacation;
 import tn.esprit.spring.entities.VacationRequest;
@@ -58,7 +59,8 @@ public class VacationTest {
                 new VacationRequest(employe, supervisor, TestUtility.dateGenerator(1,9,2022), TestUtility.dateGenerator(7,9,2022)));
         vacationServiceMock = Mockito.mock(IVacationService.class);
         employeService = Mockito.mock(IEmployeService.class);
-        vacationService.vacationRequestManager = vacationRequestRepository;
+        //vacationService = new VacationService();
+        vacationRequestRepository = Mockito.mock(VacationRequestRepository.class);
         TimeSheetUtility.injectVacationService(vacationServiceMock);
         TimeSheetUtility.injectEmployeeService(employeService);
     }
@@ -77,12 +79,18 @@ public class VacationTest {
 
     @Test
     void findRequestTest () {
+        vacationService = new VacationService();
+        vacationService.vacationRequestManager = vacationRequestRepository;
         Mockito.when(vacationRequestRepository.findById(request.getId())).thenReturn(java.util.Optional.ofNullable(request));
+        Assertions.assertNotNull(vacationService);
+        Assertions.assertNotNull(request);
         Assertions.assertEquals(request, vacationService.getRequestById(request.getId()));
     }
 
     @Test
     void getRequestsByEmployeeTest () {
+        vacationService = new VacationService();
+        vacationService.vacationRequestManager = vacationRequestRepository;
         Mockito.when(vacationRequestRepository.findVacationRequestsByEmploye_Id(employe.getId())).thenReturn(vacationsRequests);
         Assertions.assertEquals(vacationsRequests, vacationService.getEmployeeRequests(employe.getId()));
     }

@@ -68,6 +68,8 @@ public class VacationService implements IVacationService{
     private VacationRequest getFullRequest (VacationRequest request) {
         if (request == null)
             return null;
+        if (request.getEmploye() == null)
+            return request;
         request.setOverlappingTimeSheets(timesheetManager.getOverlappingTimeSheets(request.getEmploye().getId(), request.getFrom(), request.getTo()));
         request.setOverlapTimeSheet(request.getOverlappingTimeSheets().isEmpty() ? Boolean.FALSE : Boolean.TRUE);
         return request;
