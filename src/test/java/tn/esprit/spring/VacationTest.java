@@ -2,19 +2,19 @@ package tn.esprit.spring;
 
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Vacation;
 import tn.esprit.spring.entities.VacationRequest;
-import tn.esprit.spring.repository.VacationRepository;
 import tn.esprit.spring.repository.VacationRequestRepository;
 import tn.esprit.spring.services.IEmployeService;
 import tn.esprit.spring.services.IVacationService;
@@ -35,20 +35,20 @@ public class VacationTest {
     @Mock
     private static Employe supervisor;
 
-    @InjectMocks
+    @Mock
     private static IVacationService vacationServiceMock;
 
     private static VacationService vacationService;
 
-    @InjectMocks
+    @Mock
     private static IEmployeService employeService;
 
-    @InjectMocks
+    @Mock
     private static VacationRequestRepository vacationRequestRepository;
 
     private static List<VacationRequest> vacationsRequests;
     private static VacationRequest request;
-    @BeforeAll
+    @BeforeClass
     public static void setUpMocks () {
         employe = Mockito.mock(Employe.class);
         supervisor = Mockito.mock(Employe.class);
@@ -66,7 +66,7 @@ public class VacationTest {
     }
 
     @Test
-    void holidayBalanceTest () {
+    public void holidayBalanceTest () {
         Mockito.when(employe.getId()).thenReturn(1);
         List<Vacation> vacations = new ArrayList<>();
         vacations.add(TestUtility.generateVacation(employe, TestUtility.dateGenerator(1,1,2022), TestUtility.dateGenerator(5,1,2022)));
@@ -78,7 +78,7 @@ public class VacationTest {
     }
 
     @Test
-    void findRequestTest () {
+    public void findRequestTest () {
         vacationService = new VacationService();
         vacationService.vacationRequestManager = vacationRequestRepository;
         Mockito.when(vacationRequestRepository.findById(request.getId())).thenReturn(java.util.Optional.ofNullable(request));
@@ -88,7 +88,7 @@ public class VacationTest {
     }
 
     @Test
-    void getRequestsByEmployeeTest () {
+    public void getRequestsByEmployeeTest () {
         vacationService = new VacationService();
         vacationService.vacationRequestManager = vacationRequestRepository;
         Mockito.when(vacationRequestRepository.findVacationRequestsByEmploye_Id(employe.getId())).thenReturn(vacationsRequests);
