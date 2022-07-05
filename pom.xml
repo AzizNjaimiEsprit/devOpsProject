@@ -143,11 +143,11 @@
 <distributionManagement>
 <snapshotRepository>
 <id>deploymentRepo</id>
-<url>http://localhost:8081/repository/maven-snapshots/</url>
+<url>http://localhost:8081/service/rest/repository/browse/maven-snapshots/</url>
 </snapshotRepository>
 <repository>
 <id>deploymentRepo</id>
-<url>http://localhost:8081/repository/maven-releases/</url>
+<url>http://localhost:8081/service/rest/repository/browse/maven-releases/</url>
 </repository>
 </distributionManagement>
 </project>
