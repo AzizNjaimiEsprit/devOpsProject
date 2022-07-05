@@ -144,7 +144,6 @@
 <snapshotRepository>
 <id>deploymentRepo</id>
 <url>http://localhost:8081/nexus/content/repositories/maven-snapshots/</url>
-</snapshotRepository>/</url>
 </snapshotRepository>
 <repository>
 <id>deploymentRepo</id>
