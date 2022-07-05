@@ -1,5 +1,9 @@
 package tn.esprit.spring.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -7,6 +11,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+@Getter
+@Setter
 @Embeddable
 public class TimesheetPK implements Serializable {
 
@@ -15,31 +21,15 @@ public class TimesheetPK implements Serializable {
 	private int idMission;
 	
 	private int idEmploye;
-	
-	//Choisir le TemporalType selon le besoin metier
+
 	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
 	private Date dateDebut;
 	
 	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
 	private Date dateFin;
-	
 
-	public TimesheetPK() {
-		super();
-	}
-	
-	public TimesheetPK(int idMission, int idEmploye, Date dateDebut, Date dateFin) {
-		super();
-		this.idMission = idMission;
-		this.idEmploye = idEmploye;
-		this.dateDebut = dateDebut;
-		this.dateFin = dateFin;
-	}
-
-	//Pour que hibernate peut comparer deux objets (par exemple : recherche de l'objet dans le persistenceContext), 
-	//Il doit pouvoir comparer les primary key des deux entites
-	//Vu que l'entite a une clé composé, on doit implementer la methode equal.
-	//Utiliser l'IDE pour générer le equal et le hashcode
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -71,38 +61,6 @@ public class TimesheetPK implements Serializable {
 		} else if (!dateFin.equals(other.dateFin))
 			return false;
 		return idMission == other.idMission;
-	}
-
-	public void setIdMission(int idMission) {
-		this.idMission = idMission;
-	}
-
-	public int getIdEmploye() {
-		return idEmploye;
-	}
-
-	public void setIdEmploye(int idEmploye) {
-		this.idEmploye = idEmploye;
-	}
-
-	public Date getDateDebut() {
-		return dateDebut;
-	}
-
-	public void setDateDebut(Date dateDebut) {
-		this.dateDebut = dateDebut;
-	}
-
-	public Date getDateFin() {
-		return dateFin;
-	}
-
-	public void setDateFin(Date dateFin) {
-		this.dateFin = dateFin;
-	}
-
-	public int getIdMission() {
-		return idMission;
 	}
 
 }

@@ -1,9 +1,14 @@
 package tn.esprit.spring.services;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,85 +25,88 @@ import tn.esprit.spring.repository.TimesheetRepository;
 
 @Service
 public class TimesheetServiceImpl implements ITimesheetService {
-	
 
 	@Autowired
-	MissionRepository missionRepository;
+	private TimesheetRepository timesheetManager;
+
 	@Autowired
-	DepartementRepository deptRepoistory;
+	private EmployeRepository employeeRepository;
+
 	@Autowired
-	TimesheetRepository timesheetRepository;
+	private MissionRepository missionManager;
+
 	@Autowired
-	EmployeRepository employeRepository;
-	
-	public int ajouterMission(Mission mission) {
-		missionRepository.save(mission);
-		return mission.getId();
-	}
-    
-	public void affecterMissionADepartement(int missionId, int depId) {
-		Mission mission = missionRepository.findById(missionId).get();
-		Departement dep = deptRepoistory.findById(depId).get();
-		mission.setDepartement(dep);
-		missionRepository.save(mission);
-		
+	private DepartementRepository departementManager;
+
+	private static final Logger logger = LoggerFactory.getLogger(TimesheetServiceImpl.class);
+
+
+	@Override
+	public Mission addMission(Mission mission) {
+		return Optional.ofNullable(mission).map(m -> missionManager.save(mission)).orElse(null);
 	}
 
-	public void ajouterTimesheet(int missionId, int employeId, Date dateDebut, Date dateFin) {
-		TimesheetPK timesheetPK = new TimesheetPK();
-		timesheetPK.setDateDebut(dateDebut);
-		timesheetPK.setDateFin(dateFin);
-		timesheetPK.setIdEmploye(employeId);
-		timesheetPK.setIdMission(missionId);
-		
+	@Override
+	public void assignMissionToDepartment(int missionId, int depId) {
+		Departement requestedDepartment = departementManager.findById(depId).get();
+		if (Objects.isNull(requestedDepartment)) {
+			logger.error("Assigning mission failed. Please check mission details");
+			throw new RuntimeException("Department doesn't exist");
+		}
+
+		Optional.ofNullable(missionManager.findById(missionId).get()).ifPresent(m -> {
+			m.setDepartement(requestedDepartment);
+			missionManager.save(m);
+			logger.info("Mission assigned successfully");
+		});
+	}
+
+	@Override
+	public void addTimeSheet(int missionId, int employeId, Date dateDebut, Date dateFin) {
+		Mission mission = missionManager.findById(missionId).get();
+		if (Objects.isNull(mission)) {
+			logger.error("Add timesheet failed there is no such mission");
+			throw new RuntimeException("Mission doesn't exist");
+		}
+
+
+		Employe employe = employeeRepository.findById(missionId).get();
+		if (Objects.isNull(employe)) {
+			logger.error("Add timesheet failed there is no such employee");
+			throw new RuntimeException("Employee doesn't exist");
+		}
+
+
+		if (Objects.isNull(dateDebut) || Objects.isNull(dateFin) || dateDebut.after(dateFin)) {
+			logger.error("Add timesheet failed check start & end date");
+			throw new RuntimeException("Timesheet input is wrong");
+		}
+
+
+		timesheetManager.save(generateTimeSheet(mission, employe, dateDebut, dateFin));
+		logger.info("Timesheet added successfully");
+	}
+
+	private Timesheet generateTimeSheet (Mission mission , Employe employe, Date start, Date end) {
+		TimesheetPK pk = new TimesheetPK();
+		pk.setDateDebut(start);
+		pk.setDateFin(end);
+		pk.setIdEmploye(employe.getId());
 		Timesheet timesheet = new Timesheet();
-		timesheet.setTimesheetPK(timesheetPK);
-		timesheet.setValide(false); //par defaut non valide
-		timesheetRepository.save(timesheet);
-		
+		timesheet.setTimesheetPK(pk);
+		timesheet.setMission(mission);
+		timesheet.setEmploye(employe);
+		return timesheet;
 	}
 
-	
-	public void validerTimesheet(int missionId, int employeId, Date dateDebut, Date dateFin, int validateurId) {
-		System.out.println("In valider Timesheet");
-		Employe validateur = employeRepository.findById(validateurId).get();
-		Mission mission = missionRepository.findById(missionId).get();
-		//verifier s'il est un chef de departement (interet des enum)
-		if(!validateur.getRole().equals(Role.CHEF_DEPARTEMENT)){
-			System.out.println("l'employe doit etre chef de departement pour valider une feuille de temps !");
-			return;
-		}
-		//verifier s'il est le chef de departement de la mission en question
-		boolean chefDeLaMission = false;
-		for(Departement dep : validateur.getDepartements()){
-			if(dep.getId() == mission.getDepartement().getId()){
-				chefDeLaMission = true;
-				break;
-			}
-		}
-		if(!chefDeLaMission){
-			System.out.println("l'employe doit etre chef de departement de la mission en question");
-			return;
-		}
-//
-		TimesheetPK timesheetPK = new TimesheetPK(missionId, employeId, dateDebut, dateFin);
-		Timesheet timesheet =timesheetRepository.findBytimesheetPK(timesheetPK);
-		timesheet.setValide(true);
-		
-		//Comment Lire une date de la base de données
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		System.out.println("dateDebut : " + dateFormat.format(timesheet.getTimesheetPK().getDateDebut()));
-		
+	@Override
+	public List<Timesheet> findAllTimeSheetsByMission(int missionId, Date from, Date to) {
+		return Objects.isNull(from) && Objects.isNull(to) ? timesheetManager.findTimesheetsByMission_Id(missionId) : timesheetManager.getOverlappingTimeSheetsByMission_id(missionId, from, to);
 	}
 
-	
-	public List<Mission> findAllMissionByEmployeJPQL(int employeId) {
-		return timesheetRepository.findAllMissionByEmployeJPQL(employeId);
-	}
-
-	
-	public List<Employe> getAllEmployeByMission(int missionId) {
-		return timesheetRepository.getAllEmployeByMission(missionId);
+	@Override
+	public List<Timesheet> findAllTimeSheetsByEmployee(int employeeId, Date from, Date to) {
+		return Objects.isNull(from) && Objects.isNull(to) ? timesheetManager.findTimesheetsByEmploye_Id(employeeId) : timesheetManager.getOverlappingTimeSheets(employeeId, from, to);
 	}
 
 }

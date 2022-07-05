@@ -1,21 +1,14 @@
 package tn.esprit.spring.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
 
 @Entity
@@ -38,6 +31,7 @@ public class Employe implements Serializable {
 	//@Pattern(regex=".+\@.+\..+")
 	private String email;
 
+	@JsonIgnore
 	private String password;
 
 	private boolean actif;
@@ -61,6 +55,10 @@ public class Employe implements Serializable {
 	//@JsonBackReference
 	@OneToMany(mappedBy="employe")
 	private List<Timesheet> timesheets;
+
+	@Column(updatable = false, insertable = false)
+	@CreationTimestamp
+	private Date joinDate;
 
 
 	public Employe() {
@@ -139,7 +137,9 @@ public class Employe implements Serializable {
 	}
 
 
-
+	public Date getJoinDate() {
+		return joinDate;
+	}
 
 	public boolean isActif() {
 		return actif;

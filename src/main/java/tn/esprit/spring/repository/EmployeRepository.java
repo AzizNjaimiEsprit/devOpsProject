@@ -21,7 +21,7 @@ public interface EmployeRepository extends CrudRepository<Employe, Integer>  {
 
 
 
-    @Query("SELECT count(*) FROM Employe")
+    @Query("SELECT count(e) FROM Employe e")
     public int countemp();
 
     @Query("SELECT nom FROM Employe")
@@ -55,7 +55,6 @@ public interface EmployeRepository extends CrudRepository<Employe, Integer>  {
             + "join emp.departements deps "
             + "where deps.id=:depId")
     public Double getSalaireMoyenByDepartementId(@Param("depId")int departementId);
-
 
 
 

@@ -18,17 +18,17 @@ public class Mission implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	
+
 	private String name;
-	
+
 	private String description;
-	
+
 	@ManyToOne
 	private Departement departement;
-	
+
 	@OneToMany(mappedBy="mission")
 	private  List<Timesheet> timesheets;
-	
+
 	public Mission() {
 		super();
 	}
@@ -37,7 +37,7 @@ public class Mission implements Serializable {
 		this.name = name;
 		this.description = description;
 	}
-	
+
 
 	public int getId() {
 		return id;
@@ -78,7 +78,7 @@ public class Mission implements Serializable {
 	public void setTimesheets(List<Timesheet> timesheets) {
 		this.timesheets = timesheets;
 	}
-	
-	
+
+
 
 }
