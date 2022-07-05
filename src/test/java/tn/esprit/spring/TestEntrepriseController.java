@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @TestMethodOrder(value = OrderAnnotation.class)
 @DisplayName("Test Entreprise repository class")
-public class TestEntrepriseController {
+class TestEntrepriseController {
     private static final Logger log = LogManager.getLogger(TestEntrepriseController.class);
 
     @Autowired
@@ -41,7 +41,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test insert entreprise methode")
     @Order(1)
-	public void ajouterEntrepriseTest() {
+	void ajouterEntrepriseTest() {
 		
 		int a = es.ajouterEntreprise(ent);
 		assertTrue(a > 0);
@@ -53,7 +53,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test insert departement methode")
     @Order(2)
-	public void ajouterDepartementTest() {
+	void ajouterDepartementTest() {
 		
 		int a = es.ajouterDepartement(dep);
 		assertTrue(a > 0);
@@ -65,7 +65,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test affect departement to entreprise")
     @Order(3)
-	public void affecterDepartementAEntrepriseTest() {
+	void affecterDepartementAEntrepriseTest() {
 		int addedEntrepriseId = es.ajouterEntreprise(ent);
 		int addedDepId = es.ajouterDepartement(dep);
 		es.affecterDepartementAEntreprise(addedDepId, addedEntrepriseId);
@@ -86,7 +86,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test get department by entreprise")
     @Order(4)
-	public void getAllDepartementsNamesByEntrepriseTest() {
+	void getAllDepartementsNamesByEntrepriseTest() {
 		int addedEntrepriseId = es.ajouterEntreprise(ent);
 		int addedDepId = es.ajouterDepartement(dep);
 		List<String> names = es.getAllDepartementsNamesByEntreprise(addedEntrepriseId);
@@ -100,7 +100,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test get entreprise by id")
     @Order(5)
-	public void getEntrepriseByIdTest() {
+	void getEntrepriseByIdTest() {
 		int a = es.ajouterEntreprise(ent);
 		Optional<Entreprise> entOpt = er.findById(a);
 		Entreprise entr = null;
@@ -119,7 +119,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test remove entreprise")
     @Order(6)
-	public void deleteEntrepriseByIdTest() {
+	void deleteEntrepriseByIdTest() {
 		int a = es.ajouterEntreprise(ent);
 		log.info("test remove entreprise");
 		es.deleteEntrepriseById(a);
@@ -130,7 +130,7 @@ public class TestEntrepriseController {
 	@Test
 	@DisplayName("Test remove departement")
     @Order(7)
-	public void deleteDepartementByIdTest() {
+	void deleteDepartementByIdTest() {
 		int a = es.ajouterDepartement(dep);
 		log.info("test remove departement");
 		es.deleteDepartementById(a);
